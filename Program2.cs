@@ -1,86 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-class Person
+namespace Level2
 {
-    private string family;
-    public string Family { get { return family; } }
-
-
-    public Person(string family1)
+    internal class Program
     {
-        family = family1;
-
-    }
-}
-
-class Student : Person
-{
-    private static int id;
-    private int number;
-    private double rez1, rez2, rez3, rez4;
-    private double rez;
-    private double sr(double x, double y, double z, double w)
-    {
-        return (x + y + z + w) / 4;
-    }
-    public double Rez { get { return rez; } }
-    public Student(string family, double rezz1, double rezz2, double rezz3, double rezz4) : base(family)
-    {
-        rez = 0;
-        rez1 = rezz1;
-        rez2 = rezz2;
-        rez3 = rezz3;
-        rez4 = rezz4;
-        rez = sr(rez1, rez2, rez3, rez4);
-        number = Convert.ToInt32($"2305{id}");
-        id++;
-    }
-    public void DisplayInfo()
-    {
-        Console.WriteLine("Фамилия {0}\t Номер студ билета {1}\t Средний балл {2,4:f2}", Family, number, Rez);
-    }
-}
-
-class Program
-{
-    static void Main(string[] args)
-    {
-        Student[] os = new Student[4];
-        os[0] = new Student("Умкин", 3.0, 4.0, 5.0, 4.0);
-        os[1] = new Student("Пупкин", 4.0, 5.0, 3.0, 5.0);
-        os[2] = new Student("Лупкин", 3.0, 3.0, 4.0, 5.0);
-        os[3] = new Student("Зупкин", 5.0, 5.0, 5.0, 5.0);
-
-        foreach (var student in os)
+        struct Student
         {
-            student.DisplayInfo();
+            private string _surname;
+            private string _name;
+            private double[] _exams;
+            private bool _passed;
+
+            public bool Passed { get { return _passed; } }
+
+            public Student(string surname, string name, params double[] exams)
+            {
+                _surname = surname;
+                _name = name;
+                _exams = exams;
+                _passed = exams.All(exam => exam != 2);
+            }
+
+            public double Avg()
+            {
+                return _exams.Average();
+            }
+
+            public void Display()
+            {
+                Console.WriteLine($"{_surname} {_name}, средний балл: {Avg()}");
+            }
         }
 
-        for (int i = 0; i < os.Length - 1; i++)
+        static void Main(string[] args)
         {
-            double amax = os[i].Rez;
-            int imax = i;
-            for (int j = i + 1; j < os.Length; j++)
+            Student[] students = new Student[7]
             {
-                if (os[j].Rez > amax)
+        new Student("Kintina", "Darya", 4, 2, 5),
+        new Student("Chernogus", "Maria", 4, 3, 5),
+        new Student("Juravlev", "Stepan", 2, 3, 5),
+        new Student("Abazov", "Aslan", 5, 5, 5),
+        new Student("Litvin", "Mikhail", 2, 3, 2),
+        new Student("Didaev", "Muhammad", 5, 4, 5),
+        new Student("Kirchu", "Ksenia", 5, 4, 5)
+            };
+
+            Sort(students);
+
+            foreach (var student in students)
+            {
+                if (student.Passed)
                 {
-                    amax = os[j].Rez;
-                    imax = j;
+                    student.Display();
                 }
             }
-            Student temp;
-            temp = os[imax];
-            os[imax] = os[i];
-            os[i] = temp;
         }
 
-        Console.WriteLine();
-
-        foreach (var student in os)
+        static void Sort(Student[] Students)
         {
-            if (student.Rez >= 4)
+            for (int i = 1; i < Students.Length; i++)
             {
-                student.DisplayInfo();
+                for (int j = 1; j < Students.Length; j++)
+                {
+                    if (Students[j].Avg() > Students[j - 1].Avg())
+                    {
+                        Student temp = Students[j];
+                        Students[j] = Students[j - 1];
+                        Students[j - 1] = temp;
+                    }
+                }
             }
         }
     }

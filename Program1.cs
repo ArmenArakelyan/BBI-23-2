@@ -1,181 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-class Program
+namespace Level1
 {
-    static void Main(string[] args)
-    { ////#1 
-        using System;
-        using System.Collections.Generic;
-        using System.Linq;
+    struct Participant
+    {
+        private string _surname;
+        private string _group;
+        private string _teacher;
+        private int _result;
+        private bool _passed;
+        public bool Passed { get { return _passed; } }
+        public int Result { get { return _result; } }
+        public Participant(string surname, string group, string teacher, int result)
+        {
+            _surname = surname;
+            _group = group;
+            _teacher = teacher;
+            _result = result;
+            if (result <= 115) // Допустим, что норматив сдан, если результат не более 115 секунд
+            {
+                _passed = true;
+            }
+            else
+            {
+                _passed = false;
+            }
+        }
 
-class Program
+        public void Display()
+        {
+            if (_passed)
+            {
+                Console.WriteLine($"{_surname}, группа: {_group} / Преподаватель: {_teacher} / Результат: {_result} секунд - сдал(-а)");
+            }
+            else
+            {
+                Console.WriteLine($"{_surname}, группа: {_group} / Преподаватель: {_teacher} / Результат: {_result} секунд - не сдал(-а)");
+            }
+        }
+    }
+    internal class Program
     {
         static void Main(string[] args)
         {
-            List<Run_500m> run500 = new List<Run_500m>();
-
-            run500.Add(new Run_500m("Иванова", "Группа 1", "Тренер Ларкова", 120));
-            run500.Add(new Run_500m("Петрова", "Группа 2", "Тренер Паркова", 110));
-            run500.Add(new Run_500m("Сидорова", "Группа 1", "Тренер Жаркова", 100));
-            run500.Add(new Run_500m("Смирнова", "Группа 3", "Тренер Маркова", 90));
-
-            Console.WriteLine("Результаты кросса на 500м:");
-            Console.WriteLine("Фамилия\t\t Группа \t\t Преподаватель \t\t Результат в секундах \t\t Норматив");
-
-            foreach (var runner in run500.OrderBy(runner => runner.Result))
+            Participant[] participants = new Participant[6]
             {
-                runner.DisplayInfo();
-            }
-
-            int passedNorm = run500.Count(runner => runner.Result <= 100);
-            Console.WriteLine($"\nОбщее количество участниц, выполнивших норматив: {passedNorm}");
-
-            List<Run_100m> run100 = new List<Run_100m>();
-
-            run100.Add(new Run_100m("Иванова", "Группа 1", "Тренер Ларкова", 11));
-            run100.Add(new Run_100m("Петрова", "Группа 2", "Тренер Паркова", 7));
-            run100.Add(new Run_100m("Сидорова", "Группа 1", "Тренер Жаркова", 13));
-            run100.Add(new Run_100m("Смирнова", "Группа 3", "Тренер Маркова", 8));
-
-            Console.WriteLine("Результаты кросса на 100м:");
-            Console.WriteLine("Фамилия\t\t Группа \t\t Преподаватель \t\t Результат в секундах \t\t Норматив");
-
-            foreach (var runner in run100.OrderBy(runner => runner.Result))
+            new Participant("Arakelyan", "1", "Nemirovich", 95),
+            new Participant("Ivanova", "2", "Karelin", 114),
+            new Participant("Petrova", "2", "Nemirovich", 97),
+            new Participant("Sidorova", "2", "Karelin", 147),
+            new Participant("Bazieva", "1", "Nemirovich", 178),
+            new Participant("Kudzaeva", "1", "Karelin", 132)
+            };
+            Sort(participants);
+            for (int i = 0; i < participants.Length; i++)
             {
-                runner.DisplayInfo();
+                participants[i].Display();
             }
+            int c = 0;
+            for (int i = 0; i < participants.Length; i++)
+            {
+                if (participants[i].Passed)
+                {
+                    c++;
+                }
 
-            passedNorm = run100.Count(runner => runner.Result <= 100);
-            Console.WriteLine($"\nОбщее количество участниц, выполнивших норматив: {passedNorm}");
+            }
+            Console.WriteLine($"Кол-во участниц, выполнивших норматив: {c}");
         }
-    }
 
-    abstract class Runner
-    {
-        public string Surname { get; private set; }
-        public string Group { get; private set; }
-        public string TeacherSurname { get; private set; }
-        public double Result { get; private set; }
-
-        public Runner(string surname, string group, string teacherSurname, double result)
+        static void Sort(Participant[] Participants)
         {
-            Surname = surname;
-            Group = group;
-            TeacherSurname = teacherSurname;
-            Result = result;
+            for (int i = 1; i < Participants.Length; i++)
+            {
+                Participant current = Participants[i];
+                int j = i - 1;
+                while (j >= 0 && Participants[j].Result > current.Result)
+                {
+                    Participants[j + 1] = Participants[j];
+                    j--;
+                }
+
+
+                Participants[j + 1] = current;
+            }
         }
 
-        public virtual void DisplayInfo()
-        {
-            Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result}");
-        }
-    }
-
-    class Run_500m : Runner
-    {
-        public Run_500m(string Surname, string Group, string TeacherSurname, double Result) : base(Surname, Group, TeacherSurname, Result)
-        {
-
-        }
-        public override void DisplayInfo()
-        {
-            Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result:F2}\t\t{(Result <= 100 ? "Выполнен" : "Не выполнен")}");
-        }
-    }
-
-    class Run_100m : Runner
-    {
-        public Run_100m(string Surname, string Group, string TeacherSurname, double Result) : base(Surname, Group, TeacherSurname, Result)
-        {
-
-        }
-        public override void DisplayInfo()
-        {
-            Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result:F2}\t\t{(Result <= 10 ? "Выполнен" : "Не выполнен")}");
-        }
-    }
-
-    List<Run_500m> run500 = new List<Run_500m>();
-
-    run500.Add(new Run_500m("Иванова", "Группа 1", "Тренер Ларкова", 120)); 
-        run500.Add(new Run_500m("Петрова", "Группа 2", "Тренер Паркова", 110)); 
-        run500.Add(new Run_500m("Сидорова", "Группа 1", "Тренер Жаркова", 100)); 
-        run500.Add(new Run_500m("Смирнова", "Группа 3", "Тренер Маркова", 90)); 
-
-        Console.WriteLine("Результаты кросса на 500м:"); 
-        Console.WriteLine("Фамилия\t\t Группа \t\t Преподаватель \t\t Результат в секундах \t\t Норматив"); 
-
-        foreach (var runner in run500.OrderBy(runner => runner.Result)) 
-        { 
-            runner.DisplayInfo(); 
-        }
-
-int passedNorm = run500.Count(runner => runner.Result <= 100);
-Console.WriteLine($"\nОбщее количество участниц, выполнивших норматив: {passedNorm}");
-
-List<Run_100m> run100 = new List<Run_100m>();
-
-run100.Add(new Run_100m("Иванова", "Группа 1", "Тренер Ларкова", 11));
-run100.Add(new Run_100m("Петрова", "Группа 2", "Тренер Паркова", 7));
-run100.Add(new Run_100m("Сидорова", "Группа 1", "Тренер Жаркова", 13));
-run100.Add(new Run_100m("Смирнова", "Группа 3", "Тренер Маркова", 8));
-
-Console.WriteLine("Результаты кросса на 100м:");
-Console.WriteLine("Фамилия\t\t Группа \t\t Преподаватель \t\t Результат в секундах \t\t Норматив");
-
-foreach (var runner in run100.OrderBy(runner => runner.Result))
-{
-    runner.DisplayInfo();
-}
-
-passedNorm = run100.Count(runner => runner.Result <= 100);
-Console.WriteLine($"\nОбщее количество участниц, выполнивших норматив: {passedNorm}"); 
-    } 
-} 
-
-abstract class Runner
-{
-    public string Surname { get; private set; }
-    public string Group { get; private set; }
-    public string TeacherSurname { get; private set; }
-    public double Result { get; private set; }
-
-    public Runner(string surname, string group, string teacherSurname, double result)
-    {
-        Surname = surname;
-        Group = group;
-        TeacherSurname = teacherSurname;
-        Result = result;
-    }
-
-    public virtual void DisplayInfo()
-    {
-        Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result}");
-    }
-}
-
-class Run_500m : Runner
-{
-    public Run_500m(string Surname, string Group, string TeacherSurname, double Result) : base(Surname, Group, TeacherSurname, Result)
-    {
-
-    }
-    public override void DisplayInfo()
-    {
-        Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result:F2}\t\t{(Result <= 100 ? "Выполнен" : "Не выполнен")}");
-    }
-}
-
-class Run_100m : Runner
-{
-    public Run_100m(string Surname, string Group, string TeacherSurname, double Result) : base(Surname, Group, TeacherSurname, Result)
-    {
-
-    }
-    public override void DisplayInfo()
-    {
-        Console.WriteLine($"{Surname}\t\t{Group}\t\t{TeacherSurname}\t\t{Result:F2}\t\t{(Result <= 10 ? "Выполнен" : "Не выполнен")}");
     }
 }
